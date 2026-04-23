@@ -1,0 +1,4 @@
+r'DRIVER={ODBC Driver 17 for SQL Server};'
+        r'SERVER=ASUS-VIVO-BOOK-\SQLEXPRESS;'
+        r'DATABASE=SmartAttendance;'
+        r'Trusted_Connection=yes;'
