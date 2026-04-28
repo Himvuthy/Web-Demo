@@ -1,7 +1,0 @@
-npm run dev -- --host
-
-when error
-
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-
-Python Web_To_Database.py
