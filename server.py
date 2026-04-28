@@ -10,11 +10,12 @@ CORS(app) # Allows your React app to communicate with this API
 # DATABASE CONFIGURATION
 # -----------------------------
 # Replace these with your Railway PUBLIC connection variables
-DB_HOST = "shortline.proxy.rlwy.net:36093"  # Look for MYSQL_PUBLIC_URL or public host in Railway
-DB_PORT = 3306                     # The 5-digit public port
+DB_HOST = "shortline.proxy.rlwy.net"  # <-- Removed the :36093 from the end
+DB_PORT = 36093                       # <-- Changed this to 36093                   # The 5-digit public port
 DB_USER = "root"
 DB_PASSWORD = "EumTjwwxjEaiyEBIabsFaPpdYaQxWxjQ"
 DB_NAME = "railway"
+
 
 def get_db_connection():
     return mysql.connector.connect(
