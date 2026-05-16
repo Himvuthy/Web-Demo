@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Fingerprint, Bell, LayoutDashboard, Database, BookOpen, 
   Cpu, FileText, Terminal, Settings, LogOut, 
   Users, CheckCircle, XCircle, BarChart3, LineChart, Sun, Moon,
-  CalendarDays, Search, Pencil, Trash2, KeyRound, PieChart,
-  Plus, MapPin, Filter, FileSpreadsheet
+  CalendarDays, Search, Pencil, Trash2, KeyRound, PieChart
 } from 'lucide-react';
 
 const AdminDashboard = ({ onLogout }) => {
@@ -43,7 +42,7 @@ const AdminDashboard = ({ onLogout }) => {
   useEffect(() => {
     const fetchAdminStats = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:5000/api/admin/stats');
+        const response = await fetch('https://web-demo-production-7fc6.up.railway.app/api/admin/stats');
         const data = await response.json();
         if (data.success) {
           setStats({
@@ -62,8 +61,16 @@ const AdminDashboard = ({ onLogout }) => {
     fetchAdminStats();
   }, []);
 
-  // 🔴 FIX: Define fetchUsers before it is called, wrapped in useCallback
-  const fetchUsers = useCallback(async (endpoint) => {
+  // 🔴 DYNAMIC FETCHING LOGIC
+  useEffect(() => {
+    if (activeView === 'database') {
+      fetchUsers('users'); // Fetches everyone
+    } else if (activeView === 'biometric') {
+      fetchUsers('students'); // Fetches only students with full details
+    }
+  }, [activeView]);
+
+  const fetchUsers = async (endpoint) => {
     setIsUsersLoading(true);
     try {
       const response = await fetch(`http://127.0.0.1:5000/api/${endpoint}`);
@@ -74,16 +81,7 @@ const AdminDashboard = ({ onLogout }) => {
     } finally {
       setIsUsersLoading(false);
     }
-  }, []);
-
-  // 🔴 DYNAMIC FETCHING LOGIC
-  useEffect(() => {
-    if (activeView === 'database') {
-      fetchUsers('users'); // Fetches everyone
-    } else if (activeView === 'biometric') {
-      fetchUsers('students'); // Fetches only students with full details
-    }
-  }, [activeView, fetchUsers]);
+  };
 
   const handleDeleteUser = async (userId, userName) => {
     if (!window.confirm(`Are you sure you want to permanently delete ${userName}?`)) return;
@@ -518,8 +516,8 @@ const AdminDashboard = ({ onLogout }) => {
                     <h3 className="font-bold text-lg">Schedule / Timetable Management</h3>
                     <p className={`text-xs ${mutedText} mt-1`}>Define active learning periods and subject schedules.</p>
                   </div>
-                  <button className={`px-4 py-2 rounded-lg font-bold text-sm text-white shadow-sm transition flex items-center gap-2 ${isDark ? 'bg-cyan-500 hover:bg-cyan-400 text-slate-900' : 'bg-indigo-500 hover:bg-indigo-600'}`}>
-                    <CalendarDays size={16} /> Add Schedule
+                  <button className={`px-4 py-2 rounded-lg font-bold text-sm text-white shadow-sm transition ${isDark ? 'bg-cyan-500 hover:bg-cyan-400 text-slate-900' : 'bg-indigo-500 hover:bg-indigo-600'}`}>
+                    <CalendarDays size={14} className="mr-1 inline" /> Add Schedule
                   </button>
                 </div>
                 <div className={`h-80 w-full flex-1 flex flex-col items-center justify-center border border-dashed rounded-xl ${isDark ? 'border-white/10' : 'border-gray-300'}`}>
@@ -536,9 +534,7 @@ const AdminDashboard = ({ onLogout }) => {
                     <h3 className="font-bold text-lg">Active Classes</h3>
                     <p className={`text-xs ${mutedText} mt-1`}>Manage rosters and assign teachers to specific subjects.</p>
                   </div>
-                  <button className={`px-4 py-2 rounded-lg font-bold text-sm text-white shadow-sm transition flex items-center gap-2 ${isDark ? 'bg-cyan-500 hover:bg-cyan-400 text-slate-900' : 'bg-indigo-500 hover:bg-indigo-600'}`}>
-                    <Plus size={16} /> Create Class
-                  </button>
+                  <button className={`px-4 py-2 rounded-lg font-bold text-sm text-white shadow-sm transition ${isDark ? 'bg-cyan-500 hover:bg-cyan-400 text-slate-900' : 'bg-indigo-500 hover:bg-indigo-600'}`}><i className="fas fa-plus mr-1"></i> Create Class</button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className={`border rounded-xl p-5 ${borderSubColor} ${subBg}`}>
@@ -551,7 +547,7 @@ const AdminDashboard = ({ onLogout }) => {
                     </div>
                     <div className={`mt-4 pt-4 border-t ${borderSubColor} flex items-center justify-between`}>
                       <div className="flex items-center gap-2">
-                        <img src="https://ui-avatars.com/api/?name=Mr.+Smith&background=eef2ff&color=6366f1" alt="avatar" className="w-6 h-6 rounded-full" />
+                        <img src="https://ui-avatars.com/api/?name=Mr.+Smith&background=eef2ff&color=6366f1" className="w-6 h-6 rounded-full" />
                         <p className={`text-xs font-medium ${mutedText}`}>Mr. Smith</p>
                       </div>
                       <button className={`text-xs font-bold hover:underline ${brandColor}`}>Manage Roster</button>
@@ -568,16 +564,14 @@ const AdminDashboard = ({ onLogout }) => {
                     <h3 className="font-bold text-lg">Biometric Hardware Endpoints</h3>
                     <p className={`text-xs ${mutedText} mt-1`}>Monitor the connection status of physical fingerprint scanners.</p>
                   </div>
-                  <button className={`px-4 py-2 rounded-lg font-bold text-sm text-white shadow-sm transition flex items-center gap-2 ${isDark ? 'bg-cyan-500 hover:bg-cyan-400 text-slate-900' : 'bg-indigo-500 hover:bg-indigo-600'}`}>
-                    <Plus size={16} /> Register Device
-                  </button>
+                  <button className={`px-4 py-2 rounded-lg font-bold text-sm text-white shadow-sm transition ${isDark ? 'bg-cyan-500 hover:bg-cyan-400 text-slate-900' : 'bg-indigo-500 hover:bg-indigo-600'}`}><i className="fas fa-plus mr-1"></i> Register Device</button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className={`border rounded-xl p-5 flex flex-col justify-between ${borderSubColor} ${subBg}`}>
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <p className="font-bold text-lg">BIO-01</p>
-                        <p className={`text-xs flex items-center ${mutedText} mt-0.5`}><MapPin size={12} className="mr-1" /> Main Entrance</p>
+                        <p className={`text-xs ${mutedText} mt-0.5`}><i className="fas fa-map-marker-alt mr-1"></i> Main Entrance</p>
                       </div>
                       <span className={`px-2.5 py-1 text-[10px] font-bold rounded flex items-center gap-1.5 ${isDark ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700'}`}>
                         <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> ONLINE
@@ -614,9 +608,9 @@ const AdminDashboard = ({ onLogout }) => {
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-3 mt-auto">
-                    <button className={`py-3 rounded-lg font-bold text-sm transition flex flex-col items-center gap-2 ${subBg} ${hoverBg} ${borderSubColor} border`}><FileSpreadsheet size={20} /> CSV</button>
-                    <button className={`py-3 rounded-lg font-bold text-sm transition flex flex-col items-center gap-2 ${subBg} ${hoverBg} ${borderSubColor} border`}><FileSpreadsheet size={20} /> Excel</button>
-                    <button className={`py-3 rounded-lg font-bold text-sm transition flex flex-col items-center gap-2 ${subBg} ${hoverBg} ${borderSubColor} border`}><FileText size={20} /> PDF</button>
+                    <button className={`py-3 rounded-lg font-bold text-sm transition flex flex-col items-center gap-2 ${subBg} ${hoverBg} ${borderSubColor} border`}><i className="fas fa-file-csv text-xl"></i> CSV</button>
+                    <button className={`py-3 rounded-lg font-bold text-sm transition flex flex-col items-center gap-2 ${subBg} ${hoverBg} ${borderSubColor} border`}><i className="fas fa-file-excel text-xl"></i> Excel</button>
+                    <button className={`py-3 rounded-lg font-bold text-sm transition flex flex-col items-center gap-2 ${subBg} ${hoverBg} ${borderSubColor} border`}><i className="fas fa-file-pdf text-xl"></i> PDF</button>
                   </div>
                 </div>
 
@@ -656,7 +650,7 @@ const AdminDashboard = ({ onLogout }) => {
                     <h3 className="font-bold text-lg">System Event Logs</h3>
                     <p className={`text-xs ${mutedText} mt-1`}>Feeds of administrative changes and specific scanner check-ins.</p>
                   </div>
-                  <button className={`text-xs px-4 py-2.5 rounded-lg font-semibold transition flex items-center gap-2 ${subBg} ${hoverBg}`}><Filter size={14} /> Filter Logs</button>
+                  <button className={`text-xs px-4 py-2.5 rounded-lg font-semibold transition flex items-center gap-2 ${subBg} ${hoverBg}`}><i className="fas fa-filter"></i> Filter Logs</button>
                 </div>
                 <div className="overflow-x-auto p-6 pt-0 custom-scrollbar">
                   <table className="w-full text-sm text-left mt-4 whitespace-nowrap">
