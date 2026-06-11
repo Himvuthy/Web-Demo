@@ -151,21 +151,21 @@ const StudentDashboard = ({ onLogout }) => {
                              <div className="w-12 h-12 rounded-full border border-yellow-200 bg-yellow-50 flex items-center justify-center text-yellow-500 mb-4 shadow-sm">
                                 <Award size={24} />
                              </div>
-                             <p className="text-2xl font-black">14</p>
+                             <p className="text-2xl font-black">-</p>
                              <p className={`text-xs font-bold ${mutedText} mt-1`}>Days Streak</p>
                           </div>
                           <div className={`${cardStyle} items-center text-center !p-8 ${isDark ? 'border-[#9333ea]/30 bg-[#9333ea]/5' : 'border-purple-200 bg-purple-50'}`}>
                              <div className="w-12 h-12 rounded-full border border-purple-200 bg-purple-500 flex items-center justify-center text-white mb-4 shadow-sm">
                                 <CheckCircle size={24} />
                              </div>
-                             <p className="text-2xl font-black">42</p>
+                             <p className="text-2xl font-black">-</p>
                              <p className={`text-xs font-bold ${mutedText} mt-1`}>Classes Logged</p>
                           </div>
                           <div className={`${cardStyle} items-center text-center !p-8`}>
                              <div className="w-12 h-12 rounded-full border border-red-200 bg-red-50 flex items-center justify-center text-red-500 mb-4 shadow-sm">
                                 <XCircle size={24} />
                              </div>
-                             <p className="text-2xl font-black">3</p>
+                             <p className="text-2xl font-black">-</p>
                              <p className={`text-xs font-bold ${mutedText} mt-1`}>Absences Left</p>
                           </div>
                        </div>

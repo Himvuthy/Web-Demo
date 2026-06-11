@@ -1,17 +1,20 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import sqlite3
+from werkzeug.security import check_password_hash
+import psycopg2
 import os
 
 app = Flask(__name__)
 CORS(app) # Allows your React app to communicate with this API
 
-DB_FILE = "database.db"
-
 def get_db_connection():
-    conn = sqlite3.connect(DB_FILE)
-    # Ensure rows are returned as tuples (default behavior) or we can just access by index
-    return conn
+    return psycopg2.connect(
+        host="acela.proxy.rlwy.net",
+        port=42391,
+        user="postgres",
+        password="TRGQfYWWHMwtolFwadVkjUjDAJIiiXvn",
+        dbname="railway"
+    )
 
 # -----------------------------
 # LOGIN ROUTE
@@ -26,11 +29,16 @@ def login():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # SQLite uses ? instead of %s
-        cursor.execute("SELECT RoleID FROM Entity WHERE Username = ? AND Password = ?", (username, password))
+        # PostgreSQL uses %s instead of ?
+        cursor.execute("""
+            SELECT e.roleid, u.passwordhash 
+            FROM USERACCOUNT u 
+            JOIN ENTITY e ON u.eid = e.eid 
+            WHERE u.username = %s
+        """, (username,))
         user = cursor.fetchone()
 
-        if user:
+        if user and check_password_hash(user[1], password):
             return jsonify({"success": True, "role": user[0]})
         else:
             return jsonify({"success": False, "message": "Invalid username or password."}), 401
@@ -50,16 +58,15 @@ def get_admin_stats():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        cursor.execute("SELECT COUNT(*) FROM Entity WHERE RoleID = 3")
+        cursor.execute("SELECT COUNT(*) FROM STUDENT")
         total_students = cursor.fetchone()[0]
         
-        cursor.execute("SELECT COUNT(*) FROM Entity WHERE FingerprintID IS NOT NULL")
+        cursor.execute("SELECT COUNT(*) FROM BIOMETRIC")
         enrolled = cursor.fetchone()[0]
         
-        cursor.execute("SELECT COUNT(*) FROM Entity WHERE FingerprintID IS NULL AND RoleID = 3")
-        notEnrolled_students = cursor.fetchone()[0]
+        notEnrolled_students = total_students - enrolled
         
-        cursor.execute("SELECT COUNT(*) FROM Class")
+        cursor.execute("SELECT COUNT(*) FROM CLASS")
         classes = cursor.fetchone()[0]
         
         return jsonify({
@@ -85,23 +92,19 @@ def get_users():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        cursor.execute("SELECT EntityID, FullName, RoleID, Email FROM Entity WHERE Username IS NOT NULL")
+        cursor.execute("""
+            SELECT e.eid, e.fullname, r.rolename, u.email 
+            FROM ENTITY e
+            JOIN USERACCOUNT u ON e.eid = u.eid
+            JOIN ROLE r ON e.roleid = r.roleid
+        """)
         rows = cursor.fetchall()
         users_list = []
         for row in rows:
-            if row[2] == 1:
-                x = 'ADMIN'
-            elif row[2] == 2:
-                x = 'TEACHER'
-            elif row[2] == 3:
-                x = 'STUDENT'
-            else:
-                x = 'NULL'
-
             users_list.append({
                 "id": row[0],
                 "name": row[1] if row[1] else "Unknown",
-                "role": x,
+                "role": row[2].upper(),
                 "email": row[3],
             })
             
@@ -121,7 +124,9 @@ def delete_user(user_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM Entity WHERE EntityID = ?", (user_id,))
+        
+        cursor.execute("DELETE FROM USERACCOUNT WHERE eid = %s", (user_id,))
+        cursor.execute("DELETE FROM ENTITY WHERE eid = %s", (user_id,))
         conn.commit()
         return jsonify({"success": True}), 200
     except Exception as e:
@@ -141,9 +146,13 @@ def get_students():
         cursor = conn.cursor()
         
         cursor.execute("""
-            SELECT EntityID, FullName, RoleID, Email, Sex, PhoneNumber, FingerprintID 
-            FROM Entity 
-            WHERE RoleID = 3
+            SELECT e.eid, e.fullname, u.email, e.gender, e.phonenumber, b.fingerindex 
+            FROM ENTITY e
+            JOIN ROLE r ON e.roleid = r.roleid
+            JOIN USERACCOUNT u ON e.eid = u.eid
+            LEFT JOIN STUDENT s ON e.eid = s.eid
+            LEFT JOIN BIOMETRIC b ON s.studentid = b.studentid
+            WHERE r.rolename = 'Student'
         """)
         rows = cursor.fetchall()
         users_list = []
@@ -153,10 +162,10 @@ def get_students():
                 "id": row[0],
                 "name": row[1] if row[1] else "Unknown",
                 "role": "STUDENT", 
-                "email": row[3],
-                "sex": row[4],
-                "phone": row[5],
-                "fingerprint_id": row[6]
+                "email": row[2],
+                "sex": row[3],
+                "phone": row[4],
+                "fingerprint_id": row[5]
             })
             
         return jsonify({"success": True, "users": users_list}), 200

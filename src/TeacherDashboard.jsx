@@ -152,7 +152,7 @@ const TeacherDashboard = ({ onLogout }) => {
            <p className={`text-[10px] ${mutedText} font-black uppercase tracking-widest`}>Total Students</p>
            <Users className={`w-4 h-4 ${mutedText}`} />
           </div>
-          <p className="text-3xl font-black mt-2">102</p>
+          <p className="text-3xl font-black mt-2">-</p>
           <p className={`text-xs ${mutedText} mt-1`}>Across all classes</p>
          </div>
          <div className={`${cardStyle}`}>
@@ -160,7 +160,7 @@ const TeacherDashboard = ({ onLogout }) => {
            <p className={`text-[10px] ${mutedText} font-black uppercase tracking-widest`}>Present Today</p>
            <Users className={`w-4 h-4 ${mutedText}`} />
           </div>
-          <p className="text-3xl font-black mt-2">90</p>
+          <p className="text-3xl font-black mt-2">-</p>
           <p className={`text-xs ${mutedText} mt-1`}>Currently logged in</p>
          </div>
          <div className={`${cardStyle}`}>
@@ -168,7 +168,7 @@ const TeacherDashboard = ({ onLogout }) => {
            <p className={`text-[10px] ${mutedText} font-black uppercase tracking-widest`}>Absent Today</p>
            <Users className={`w-4 h-4 ${mutedText}`} />
           </div>
-          <p className="text-3xl font-black mt-2 text-red-500">12</p>
+          <p className="text-3xl font-black mt-2 text-red-500">-</p>
           <p className={`text-xs ${mutedText} mt-1`}>Requires review</p>
          </div>
          <div className={`${cardStyle}`}>
@@ -176,7 +176,7 @@ const TeacherDashboard = ({ onLogout }) => {
            <p className={`text-[10px] ${mutedText} font-black uppercase tracking-widest`}>Attendance %</p>
            <Focus className={`w-4 h-4 ${mutedText}`} />
           </div>
-          <p className="text-3xl font-black mt-2 text-green-500">88.2%</p>
+          <p className="text-3xl font-black mt-2 text-green-500">-</p>
           <div className={`w-full bg-gray-200 ${isDark ? 'bg-gray-700' : ''} rounded-full h-2 mt-3`}>
            <div className="bg-purple-500 h-2 rounded-full" style={{ width: '88.2%' }}></div>
           </div>
