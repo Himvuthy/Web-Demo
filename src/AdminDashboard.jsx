@@ -42,7 +42,7 @@ const AdminDashboard = ({ onLogout }) => {
   useEffect(() => {
     const fetchAdminStats = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:5000/api/admin/stats');
+        const response = await fetch(`${import.meta.env.VITE_API_URL || \'${import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000'}\'}/api/admin/stats`);
         const data = await response.json();
         if (data.success) {
           setStats({
@@ -73,7 +73,7 @@ const AdminDashboard = ({ onLogout }) => {
   const fetchUsers = async (endpoint) => {
     setIsUsersLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/${endpoint}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000'}/api/${endpoint}`);
       const data = await response.json();
       if (data.success) setUsers(data.users);
     } catch (error) {
@@ -86,7 +86,7 @@ const AdminDashboard = ({ onLogout }) => {
   const handleDeleteUser = async (userId, userName) => {
     if (!window.confirm(`Are you sure you want to permanently delete ${userName}?`)) return;
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/users/${userId}`, { method: 'DELETE' });
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000'}/api/users/${userId}`, { method: 'DELETE' });
       const data = await response.json();
       if (data.success) {
         setUsers(users.filter(user => user.id !== userId)); 
@@ -103,7 +103,7 @@ const AdminDashboard = ({ onLogout }) => {
     if (!newName || newName === currentName) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/users/${userId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000'}/api/users/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newName, role: currentRole })
