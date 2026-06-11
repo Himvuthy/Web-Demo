@@ -1,0 +1,8 @@
+# Ignore Python backend files - Vercel only builds the React frontend
+requirements.txt
+server.py
+init_db.py
+fix_api.py
+database.db
+*.pyc
+__pycache__/
