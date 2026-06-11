@@ -42,7 +42,7 @@ const AdminDashboard = ({ onLogout }) => {
   useEffect(() => {
     const fetchAdminStats = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || \'${import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000'}\'}/api/admin/stats`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000'}/api/admin/stats`);
         const data = await response.json();
         if (data.success) {
           setStats({
